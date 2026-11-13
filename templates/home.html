@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<main style="padding: 40px 20px; text-align: center; color: #fff;">
+    <div style="max-width: 800px; margin: 0 auto; background: rgba(22, 27, 34, 0.9); padding: 40px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+        <h1 style="font-size: 36px; margin-bottom: 15px; color: #818cf8;">⚡ Bienvenido a GamerLab - CampusArena</h1>
+        <p style="color: #94a3b8; font-size: 16px; margin-bottom: 30px;">
+            Plataforma institucional de eSports, torneos y bazar con custodia Escrow para estudiantes de INACAP Sede Maipú.
+        </p>
+        <div style="display: flex; justify-content: center; gap: 15px;">
+            <a href="{% url 'lista_torneos' %}" style="background: #6366f1; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;">Ver Torneos Activos</a>
+            <a href="{% url 'bazar_catalogo' %}" style="background: rgba(255,255,255,0.1); color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; border: 1px solid rgba(255,255,255,0.2);">Ir al Bazar Gamer</a>
+        </div>
+    </div>
+</main>
+{% endblock %}

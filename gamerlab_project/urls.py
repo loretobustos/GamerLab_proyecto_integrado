@@ -1,20 +1,17 @@
-"""
-URL configuration for gamerlab_project project.
-"""
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic import TemplateView
+from django.conf import settings
+from django.conf.urls.static import static
+from torneos.views import lista_torneos_view 
 
 urlpatterns = [
-    # Panel de administración de Django
     path('admin/', admin.site.urls),
-    
-    # Página de inicio principal (Carga el index.html de tu compañero)[cite: 1]
-    path('', TemplateView.as_view(template_name='index.html'), name='home'),
-    
-    # Rutas de las aplicaciones de GamerLab
+    # AQUÍ ESTÁ LA CLAVE: Agregamos name='home'
+    path('', include('torneos.urls')),       
     path('cuentas/', include('cuentas.urls')),
-    path('torneos/', include('torneos.urls')),
-    path('arbitraje/', include('arbitraje.urls')),
     path('bazar/', include('bazar.urls')),
+    path('arbitraje/', include('arbitraje.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

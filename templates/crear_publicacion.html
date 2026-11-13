@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<main style="padding: 40px 20px; max-width: 600px; margin: 0 auto; color: #fff;">
+    <div style="background: rgba(22, 27, 34, 0.9); padding: 30px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+        <h2 style="color: #818cf8; margin-bottom: 10px;">📦 Publicar Artículo en el Bazar</h2>
+        <p style="color: #94a3b8; font-size: 14px; margin-bottom: 25px;">Ofrece tus periféricos, accesorios o juegos a la comunidad de INACAP Sede Maipú.</p>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Título del Producto (ej: Teclado Mecánico Redragon)</label>
+                <input type="text" name="titulo" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff;">
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Descripción y Estado</label>
+                <textarea name="descripcion" rows="4" placeholder="Detalles de uso, modelo, switches, etc." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff;"></textarea>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Valor en Créditos (CR)</label>
+                <input type="number" step="0.01" name="precio_creditos" required placeholder="Ej: 350" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff;">
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Fotografía del Producto (Opcional)</label>
+                <input type="file" name="imagen" accept="image/*" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff;">
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" style="flex: 1; padding: 12px; background: #6366f1; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Publicar Artículo</button>
+                <a href="{% url 'bazar_catalogo' %}" style="padding: 12px 20px; background: rgba(255,255,255,0.1); color: #fff; text-align: center; border-radius: 6px; text-decoration: none; font-weight: bold; border: 1px solid rgba(255,255,255,0.2);">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</main>
+{% endblock %}

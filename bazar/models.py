@@ -3,18 +3,14 @@ from django.conf import settings
 
 class PublicacionBazar(models.Model):
     id_publicacion = models.AutoField(primary_key=True)
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='publicaciones_bazar')
-    titulo = models.CharField(max_length=100)
+    usuario = models.ForeignKey('cuentas.Usuario', on_delete=models.CASCADE)
+    titulo = models.CharField(max_length=150)
     descripcion = models.TextField()
     precio_creditos = models.DecimalField(max_digits=10, decimal_places=2)
-    estado = models.CharField(max_length=30, default='Disponible', choices=[
-        ('Disponible', 'Disponible'),
-        ('Reservado', 'Reservado'),
-        ('Canjeado', 'Canjeado'),
-        ('Cancelado', 'Cancelado')
-    ])
-    fecha_publicacion = models.DateTimeField(auto_now_add=True)
-
+    # EL NOMBRE DEBE SER ESTE:
+    imagen = models.ImageField(upload_to='bazar/', blank=True, null=True) 
+    estado = models.CharField(max_length=30, default='Disponible')
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return f"{self.titulo} ({self.precio_creditos} CR)"
 

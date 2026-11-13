@@ -20,11 +20,17 @@
         </div>
       </a>
 
-      <nav class="nav-links">
+      <nav>
         <a href="{% url 'home' %}">Inicio</a>
         <a href="{% url 'lista_torneos' %}">Torneos</a>
         <a href="{% url 'bazar_catalogo' %}">Bazar</a>
-        <a href="{% url 'sala_disputas' %}">Arbitraje</a>
+
+        {% if user.is_authenticated %}
+            <!-- Vistas exclusivas para Administradores o Staff (Panel Escrow) -->
+            {% if user.is_staff or user.rol == 'Administrador' %}
+                <a href="{% url 'panel_admin_escrow' %}" style="color: var(--warning, #fbbf24);">🛡️ Admin Escrow</a>
+            {% endif %}
+        {% endif %}
       </nav>
 
       <div class="user-zone">
