@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<main>
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <h1 style="font-size:38px">Torneos de la Sede</h1>
+        <p>Inscripciones, modalidades en potencia de 2 y premios en créditos comunitarios.</p>
+      </div>
+      <a class="btn btn-primary" href="{% url 'matchmaking' %}">Ir a Matchmaking ELO</a>
+    </div>
+
+    <div id="tournament-grid" class="grid-4">
+      {% for torneo in torneos %}
+      <div class="card item-card">
+        <div class="item-top">
+          <div>
+            <h3>{{ torneo.nombre }}</h3>
+            <small style="color:var(--muted)">{{ torneo.juego }}</small>
+          </div>
+          <span class="badge badge-success">{{ torneo.estado }}</span>
+        </div>
+        <p>Cupos máx: <strong>{{ torneo.cupos_maximos }}</strong></p>
+        <p class="item-price">+{{ torneo.premio_creditos|floatformat:0 }} CR</p>
+
+        {% if user.is_authenticated %}
+        <form method="POST" action="{% url 'inscribir_escuadra' torneo.id_torneo %}" class="stack">
+          {% csrf_token %}
+          <div class="field">
+            <input name="nombre_escuadra" placeholder="Nombre de tu Escuadra" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Inscribirse al Torneo</button>
+        </form>
+        {% else %}
+        <p><a href="{% url 'login' %}" style="color:var(--primary-2)">Inicia sesión para inscribirte</a></p>
+        {% endif %}
+      </div>
+      {% empty %}
+      <div class="card"><p>No hay torneos activos programados por la administración.</p></div>
+      {% endfor %}
+    </div>
+  </div>
+</main>
+{% endblock %}

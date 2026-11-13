@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <span class="eyebrow">Temporada universitaria 2026</span>
+      <h1>Compite, conecta y canjea dentro de tu sede.</h1>
+      <p class="lead">GamerLab centraliza torneos, rankings intercarreras, matchmaking y un Bazar Gamer con créditos retenidos mediante Escrow hasta confirmar la entrega.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="{% url 'lista_torneos' %}">Ver torneos</a>
+        <a class="btn" href="{% url 'bazar_catalogo' %}">Entrar al Bazar</a>
+        <a class="btn btn-ghost" href="{% url 'sala_disputas' %}">Sala de Arbitraje</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">
+        <h3>Final de sede · En vivo</h3>
+        <span class="badge badge-danger">LIVE</span>
+      </div>
+      <div class="grid-2">
+        <div class="card soft"><strong>ByteBrawlers</strong><p>Ing. Informática</p><span class="badge badge-info">2 victorias</span></div>
+        <div class="card soft"><strong>TurboTorque</strong><p>Ing. Mecánica</p><span class="badge badge-success">1 victoria</span></div>
+      </div>
+      <p style="text-align:center;font-size:26px;font-weight:900">2 — 1</p>
+      <div class="notice success">Premio del encuentro: +150 créditos comunitarios.</div>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="container">
+    <section class="section">
+      <div class="section-head">
+        <div><h2>Mi panel institucional</h2><p>Estado real de tu billetera y perfil competitivo.</p></div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi"><strong>{% if user.is_authenticated %}{{ user.saldo_creditos|floatformat:0 }}{% else %}0{% endif %}</strong><span>Créditos disponibles</span></div>
+        <div class="kpi"><strong>{% if user.is_authenticated %}{{ user.reputacion }}{% else %}5.0{% endif %} ★</strong><span>Reputación Trader</span></div>
+        <div class="kpi"><strong>{% if user.is_authenticated %}{{ user.rol }}{% else %}Invitado{% endif %}</strong><span>Rol RBAC</span></div>
+        <div class="kpi"><strong>{% if user.is_authenticated and user.perfil_gamer %}{{ user.perfil_gamer.nivel_elo }}{% else %}1000{% endif %}</strong><span>Nivel ELO</span></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><div><h2>Módulos del proyecto</h2><p>Arquitectura modular integrada con Django y SQLite.</p></div></div>
+      <div class="grid-3">
+        <a class="card" href="{% url 'lista_torneos' %}"><h3>🏆 Torneos</h3><p>Inscripción, cupos en potencia de 2 y competencias internas.</p></a>
+        <a class="card" href="{% url 'bazar_catalogo' %}"><h3>🛍️ Bazar Gamer</h3><p>Publicaciones y solicitud de canje con custodia Escrow.</p></a>
+        <a class="card" href="{% url 'sala_disputas' %}"><h3>🛡️ Sala de Arbitraje</h3><p>Resolución vinculante de disputas y auditoría SHA-256.</p></a>
+      </div>
+    </section>
+  </div>
+</main>
+{% endblock %}

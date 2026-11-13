@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<main>
+  <div class="container" style="max-width:560px">
+    <div class="card">
+      <h2>Registro de Competidor</h2>
+      <p>Crea tu cuenta institucional y perfil ELO.</p>
+      <form method="POST" action="{% url 'registro' %}" class="form-grid">
+        {% csrf_token %}
+        <div class="field"><label>Usuario</label><input type="text" name="username" required></div>
+        <div class="field"><label>RUN / RUT</label><input type="text" name="run_identificador" required placeholder="12.345.678-9"></div>
+        <div class="field full"><label>Correo Institucional</label><input type="email" name="email" required placeholder="nombre@inacapmail.cl"></div>
+        <div class="field"><label>Gamertag</label><input type="text" name="gamertag" required></div>
+        <div class="field">
+          <label>Carrera</label>
+          <select name="id_carrera">
+            <option value="">Selecciona carrera</option>
+            {% for c in carreras %}<option value="{{ c.id_carrera }}">{{ c.nombre_carrera }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="field full"><label>Contraseña</label><input type="password" name="password" required></div>
+        <div class="field full"><button type="submit" class="btn btn-primary">Crear cuenta</button></div>
+      </form>
+    </div>
+  </div>
+</main>
+{% endblock %}

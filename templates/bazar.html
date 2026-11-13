@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block content %}
+<main>
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <h1 style="font-size:38px">Bazar Gamer</h1>
+        <p>HU-07 · Publicar, buscar y solicitar canjes con créditos retenidos en Escrow.</p>
+      </div>
+    </div>
+
+    <div class="notice success">
+      Al solicitar un canje, los créditos <strong>no se transfieren inmediatamente</strong>: quedan retenidos en custodia Escrow hasta confirmar la entrega presencial.
+    </div>
+
+    <section class="section card">
+      <form method="GET" action="{% url 'bazar_catalogo' %}" class="form-grid">
+        <div class="field">
+          <label>Buscar artículo</label>
+          <input name="q" value="{{ query }}" placeholder="Teclado, mouse, juego...">
+        </div>
+        <div class="field" style="align-self:end">
+          <button type="submit" class="btn btn-primary">Filtrar catálogo</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="section">
+      <div class="grid-3">
+        {% for articulo in articulos %}
+        <div class="card item-card">
+          <div class="item-top">
+            <div>
+              <h3>{{ articulo.titulo }}</h3>
+              <small style="color:var(--muted)">Vendedor: {{ articulo.usuario.username }} (★ {{ articulo.usuario.reputacion }})</small>
+            </div>
+            <span class="item-price">{{ articulo.precio_creditos|floatformat:0 }} CR</span>
+          </div>
+          <p>{{ articulo.descripcion }}</p>
+          <span class="badge badge-success">{{ articulo.estado }}</span>
+
+          <form method="POST" action="{% url 'solicitar_canje' articulo.id_publicacion %}" class="stack">
+            {% csrf_token %}
+            <div class="field">
+              <input name="mensaje" placeholder="Punto de entrega en sede (ej. Hall Central)" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Solicitar canje (Escrow)</button>
+          </form>
+        </div>
+        {% empty %}
+        <div class="card"><p>No hay artículos disponibles aún. ¡Crea uno desde el panel /admin!</p></div>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+</main>
+{% endblock %}

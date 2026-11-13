@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<main>
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <h1 style="font-size:38px">Matchmaking ELO</h1>
+        <p>Simulación de un equipo equilibrado entre estudiantes de la sede.</p>
+      </div>
+      <a class="btn" href="{% url 'lista_torneos' %}">Volver a Torneos</a>
+    </div>
+
+    <div class="grid-2">
+      <form method="POST" class="card form-grid">
+        {% csrf_token %}
+        <div class="field">
+          <label for="elo">ELO aproximado</label>
+          <select id="elo" name="elo">
+            <option value="1200">1200 · Plata / Oro bajo</option>
+            <option value="1500" selected>1500 · Oro alto / Platino</option>
+            <option value="1800">1800 · Diamante / Ascendente</option>
+            <option value="2100">2100 · Inmortal / Maestro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="mode">Modo</label>
+          <select id="mode" name="mode">
+            <option>Intercarrera mixto</option>
+            <option>Misma carrera</option>
+          </select>
+        </div>
+        <div class="field full">
+          <button type="submit" class="btn btn-primary">Calcular emparejamiento</button>
+        </div>
+      </form>
+
+      <div class="card">
+        <h3>Resultado del Matchmaking</h3>
+        {% if resultado_match %}
+          <div class="notice success" style="margin-top:14px">
+            <p><strong>Rango analizado:</strong> {{ resultado_match.rango }}</p>
+            <p><strong>Modalidad:</strong> {{ resultado_match.modo }}</p>
+            <p style="margin-top:8px; color:var(--success)">{{ resultado_match.estado }}</p>
+          </div>
+        {% else %}
+          <p style="margin-top:14px; color:var(--muted)">Selecciona tus parámetros y haz clic en calcular para buscar escuadras afines en la sede.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

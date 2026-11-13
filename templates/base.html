@@ -1,0 +1,59 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% block title %}GamerLab · CampusArena{% endblock %}</title>
+  <link rel="icon" href="{% static 'img/logo.svg' %}">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+  <!-- Barra de navegación con las clases exactas de styles.css -->
+  <header class="site-header">
+    <div class="container navbar">
+      <a class="brand" href="{% url 'home' %}">
+        <img src="{% static 'img/logo.svg' %}" alt="Logo">
+        <div>
+          <span class="brand-title">GAMERLAB</span>
+          <span class="brand-sub">CampusArena · Maipú</span>
+        </div>
+      </a>
+
+      <nav class="nav-links">
+        <a href="{% url 'home' %}">Inicio</a>
+        <a href="{% url 'lista_torneos' %}">Torneos</a>
+        <a href="{% url 'bazar_catalogo' %}">Bazar</a>
+        <a href="{% url 'sala_disputas' %}">Arbitraje</a>
+      </nav>
+
+      <div class="user-zone">
+        {% if user.is_authenticated %}
+          <div class="credit-pill">
+            <span>Créditos:</span>
+            <strong>{{ user.saldo_creditos|floatformat:0 }}</strong>
+          </div>
+          <div class="avatar" title="{{ user.username }} ({{ user.rol }})">
+            {{ user.username|slice:":2"|upper }}
+          </div>
+          <a class="btn btn-sm btn-ghost" href="{% url 'logout' %}">Salir</a>
+        {% else %}
+          <a class="btn btn-sm" href="{% url 'login' %}">Ingresar</a>
+          <a class="btn btn-sm btn-primary" href="{% url 'registro' %}">Registro</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido dinámico de cada página -->
+  {% block content %}
+  {% endblock %}
+
+  <footer class="site-footer">
+    <div class="container footer-row">
+      <span>GamerLab · CampusArena — INACAP Sede Maipú (2026)</span>
+      <span>Plataforma de Torneos, Arbitraje y Economía Circular Escrow</span>
+    </div>
+  </footer>
+</body>
+</html>
