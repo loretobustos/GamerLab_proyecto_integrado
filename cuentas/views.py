@@ -45,22 +45,22 @@ def validar_run_chileno(run_str):
 def registro_view(request):
     error = None
     if request.method == 'POST':
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        run = request.POST.get('run')
-        carrera_id = request.POST.get('carrera')
-        rol_seleccionado = request.POST.get('rol', 'Jugador')
+        username = (request.POST.get('username') or '').strip()
+        email = (request.POST.get('email') or '').strip().lower()
+        password = request.POST.get('password') or ''
+        # Los nombres coinciden con los "name" del formulario registro.html
+        run = (request.POST.get('run_identificador') or '').replace('.', '').strip().upper()
+        carrera_id = request.POST.get('id_carrera')
 
         # 1. Validación estricta del correo institucional
         if not email.endswith('@inacapmail.cl'):
             error = "El correo debe pertenecer al dominio institucional (@inacapmail.cl)."
-        
+
         # 2. Validación estricta del RUN chileno (Módulo 11)
         elif not validar_run_chileno(run):
             error = "El RUN ingresado no es válido (revisa el dígito verificador)."
-        
-        # 3. Validar si ya existe el usuario o el RUN
+
+        # 3. Validar si ya existe el usuario, correo o RUN
         elif Usuario.objects.filter(username=username).exists():
             error = "El nombre de usuario ya está en uso."
         elif Usuario.objects.filter(email=email).exists():
@@ -70,15 +70,15 @@ def registro_view(request):
         else:
             carrera_obj = Carrera.objects.filter(id=carrera_id).first()
 
-            # Creación del usuario con rol y permisos de staff automáticos si es Admin
+            # Seguridad: todo registro público nace como Jugador.
+            # El rol Administrador solo se asigna desde el panel de administración.
             Usuario.objects.create_user(
                 username=username,
                 email=email,
                 password=password,
                 run=run,
                 carrera=carrera_obj,
-                rol=rol_seleccionado,
-                is_staff=(rol_seleccionado == 'Administrador')
+                rol='Jugador',
             )
             return redirect('login')
 

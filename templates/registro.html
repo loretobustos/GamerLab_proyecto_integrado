@@ -21,7 +21,7 @@
 
         <div class="field" style="margin-bottom: 15px;">
           <label style="display: block; margin-bottom: 5px; font-weight: 500;">RUN / RUT</label>
-          <input type="text" name="run_identificador" required placeholder="12.345.678-9" pattern="^\d{1,2}\.\d{3}\.\d{3}-[0-9kK]$|^\d{7,8}-[0-9kK]$" title="Ingrese un RUN válido con guion (ej: 12345678-9)" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff;">
+          <input type="text" name="run_identificador" required placeholder="12.345.678-5" pattern="^\d{1,2}\.\d{3}\.\d{3}-[0-9kK]$|^\d{7,8}-[0-9kK]$" title="Ingrese un RUN válido con guion (ej: 12345678-9)" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff;">
         </div>
 
         <div class="field full" style="margin-bottom: 15px;">
@@ -39,7 +39,7 @@
           <select name="id_carrera" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff;">
             <option value="" disabled selected>Selecciona carrera</option>
             {% for c in carreras %}
-              <option value="{{ c.id_carrera }}">{{ c.nombre }}</option>
+              <option value="{{ c.id }}">{{ c.nombre }}</option>
             {% endfor %}
           </select>
         </div>
