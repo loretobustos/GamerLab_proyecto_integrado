@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<main style="padding: 40px 20px; max-width: 1000px; margin: 0 auto; color: #fff;">
+    <div style="background: rgba(22, 27, 34, 0.9); padding: 30px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px;">
+        <h2 style="color: #818cf8; margin-bottom: 8px; font-size: 26px;">📦 Mis Canjes y Compras Escrow</h2>
+        <p style="color: #94a3b8; font-size: 14px;">Revisa el estado de tus adquisiciones en el Bazar Gamer y obtén tu <strong>Código OTP presencial</strong> para retirar los productos en INACAP Sede Maipú.</p>
+    </div>
+
+    <!-- Contenedor de Canjes -->
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+        {% for t in transacciones %}
+            <div style="background: rgba(22, 27, 34, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                
+                <!-- Info del Artículo -->
+                <div style="flex: 1; min-width: 260px;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                        <span style="font-size: 11px; background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 3px 8px; border-radius: 4px; font-weight: bold;">
+                            {{ t.estado|default:"En Custodia" }}
+                        </span>
+                        <span style="font-size: 13px; color: #94a3b8;">Vendedor: <strong>{{ t.publicacion.usuario.username }}</strong></span>
+                    </div>
+                    <h3 style="font-size: 18px; color: #f3f4f6; margin-bottom: 6px;">{{ t.publicacion.titulo }}</h3>
+                    <p style="font-size: 13px; color: #94a3b8;">Valor retenido: <strong style="color: #fbbf24;">{{ t.monto_retenido|floatformat:0 }} CR</strong></p>
+                </div>
+
+                <!-- Código OTP Presencial (Lo más importante para el estudiante) -->
+                <div style="background: #0d1117; border: 1px solid rgba(251, 191, 36, 0.3); padding: 15px 20px; border-radius: 8px; text-align: center; min-width: 200px;">
+                    <span style="display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Tu Código OTP Presencial</span>
+                    <code style="font-size: 22px; color: #fbbf24; font-weight: bold; letter-spacing: 2px;">
+                        {{ t.codigo_otp_presencial }}
+                    </code>
+                </div>
+
+            </div>
+        {% empty %}
+            <div style="text-align: center; padding: 50px; background: rgba(22, 27, 34, 0.5); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                <p style="color: #94a3b8; font-size: 15px;">Aún no has realizado solicitudes de canje en el bazar.</p>
+                <a href="{% url 'bazar_catalogo' %}" class="btn btn-primary" style="display: inline-block; margin-top: 15px; padding: 10px 20px; background: #6366f1; color: #fff; border-radius: 6px; text-decoration: none; font-weight: bold;">Ir a explorar el Bazar</a>
+            </div>
+        {% endfor %}
+        <span style="font-size: 11px; background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 3px 8px; border-radius: 4px; font-weight: bold;">
+    {{ t.estado_escrow|default:"En Custodia" }}
+</span>
+
+    </div>
+</main>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<main style="padding: 40px 20px; color: #fff;">
+    <div style="max-width: 900px; margin: 0 auto;">
+        
+        <!-- Tarjeta de Bienvenida Principal -->
+        <div style="background: rgba(22, 27, 34, 0.9); padding: 40px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); text-align: center; margin-bottom: 30px;">
+            <h1 style="font-size: 36px; margin-bottom: 15px; color: #818cf8;">⚡ Bienvenido a GamerLab - CampusArena</h1>
+            <p style="color: #94a3b8; font-size: 16px; margin-bottom: 30px; line-height: 1.5;">
+                Plataforma institucional de eSports, torneos, rankings, arbitraje y bazar con custodia Escrow para estudiantes de INACAP Sede Maipú.
+            </p>
+            <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                <a href="{% url 'lista_torneos' %}" style="background: #6366f1; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;">Ver Torneos Activos</a>
+                <a href="{% url 'bazar_catalogo' %}" style="background: rgba(255,255,255,0.1); color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; border: 1px solid rgba(255,255,255,0.2);">Ir al Bazar Gamer</a>
+            </div>
+        </div>
+
+        <!-- Panel de KPIs si el usuario está autenticado -->
+        {% if user.is_authenticated %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;">
+            <div style="background: rgba(22, 27, 34, 0.9); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <strong style="font-size: 24px; color: #34d399; display: block; margin-bottom: 5px;">{{ user.saldo_creditos|floatformat:0 }} CR</strong>
+                <span style="color: #94a3b8; font-size: 13px;">Créditos disponibles</span>
+            </div>
+            <div style="background: rgba(22, 27, 34, 0.9); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <strong style="font-size: 24px; color: #fbbf24; display: block; margin-bottom: 5px;">{{ user.rol }}</strong>
+                <span style="color: #94a3b8; font-size: 13px;">Rol Institucional</span>
+            </div>
+            <div style="background: rgba(22, 27, 34, 0.9); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <strong style="font-size: 24px; color: #818cf8; display: block; margin-bottom: 5px;">INACAP</strong>
+                <span style="color: #94a3b8; font-size: 13px;">Sede Maipú</span>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</main>
+{% endblock %}

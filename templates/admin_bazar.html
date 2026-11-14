@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block content %}
+<main style="padding: 40px 20px; max-width: 1100px; margin: 0 auto; color: #fff;">
+    <div style="background: rgba(22, 27, 34, 0.9); padding: 30px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+        
+        <!-- Cabecera con accesos institucionales -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+            <div>
+                <h2 style="color: #818cf8; margin-bottom: 6px; font-size: 26px;">🛡️ Panel de Administración - Custodia Escrow</h2>
+                <p style="color: #94a3b8; font-size: 14px;">Valida la entrega presencial de artículos en INACAP Sede Maipú mediante código OTP y aprueba la liberación de créditos.</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a href="{% url 'sala_disputas' %}" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; padding: 10px 14px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: bold;">
+                    ⚖️ Sala de Arbitraje
+                </a>
+                {% if user.rol == 'DAE' or user.is_superuser %}
+                <a href="{% url 'panel_dae' %}" style="background: rgba(52, 211, 153, 0.15); border: 1px solid rgba(52, 211, 153, 0.4); color: #34d399; padding: 10px 14px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: bold;">
+                    🏆 Panel DAE
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Tabla de Transacciones en Custodia -->
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+                <thead>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.2); color: #94a3b8;">
+                        <th style="padding: 12px;">Artículo</th>
+                        <th style="padding: 12px;">Vendedor</th>
+                        <th style="padding: 12px;">Comprador</th>
+                        <th style="padding: 12px;">Créditos Retenidos</th>
+                        <th style="padding: 12px;">Código OTP Presencial</th>
+                        <th style="padding: 12px; text-align: center;">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in transacciones %}
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 12px; font-weight: bold; color: #f3f4f6;">{{ t.publicacion.titulo }}</td>
+                            <td style="padding: 12px; color: #94a3b8;">{{ t.publicacion.usuario.username }}</td>
+                            <td style="padding: 12px; color: #94a3b8;">{{ t.comprador.username }}</td>
+                            <td style="padding: 12px; color: #34d399; font-weight: bold;">{{ t.monto_retenido|floatformat:0 }} CR</td>
+                            <td style="padding: 12px;">
+                                <code style="background: #0d1117; border: 1px solid rgba(251, 191, 36, 0.3); padding: 5px 10px; border-radius: 4px; color: #fbbf24; font-size: 15px; letter-spacing: 1px;">
+                                    {{ t.codigo_otp_presencial }}
+                                </code>
+                            </td>
+                            <td style="padding: 12px; text-align: center;">
+                                <form method="POST" action="{% url 'aprobar_canje_admin' t.id_transaccion %}" style="margin: 0;">
+                                    {% csrf_token %}
+                                    <button type="submit" style="background: #10b981; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer;">
+                                        Aprobar y Liberar
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 40px; color: #94a3b8;">
+                                No hay solicitudes en custodia pendientes de aprobación en este momento.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+{% endblock %}

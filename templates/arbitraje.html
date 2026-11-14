@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block content %}
+<main style="padding: 40px 20px;">
+  <div class="container">
+    <div class="section-head" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;">
+      <div>
+        <h1 style="font-size: 38px; margin-bottom: 5px;">Sala de Arbitraje</h1>
+        <p style="color: #9aa6b8; font-size: 15px;">HU-02 · Resolución de disputas con evidencia SHA-256 y log de auditoría inmutable.</p>
+      </div>
+      <span class="badge badge-danger" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; padding: 6px 12px; border-radius: 6px; font-weight: bold;">Pendientes: {{ disputas|length }}</span>
+    </div>
+
+    <div class="stack" style="display: flex; flex-direction: column; gap: 20px;">
+      {% for disputa in disputas %}
+      <div class="card grid-2" style="background: rgba(22, 27, 34, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 25px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+        
+        <!-- Información de la Disputa -->
+        <div>
+          <div class="card-title" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+            <h3 style="font-size: 18px; color: #fff;">Partida #{{ disputa.partida.id_partida }} · {{ disputa.partida.torneo.nombre }}</h3>
+            <span class="badge badge-warning" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; padding: 4px 8px; border-radius: 4px; font-size: 12px;">{{ disputa.estado }}</span>
+          </div>
+          <p style="color: #cbd5e1; font-size: 14px; margin-bottom: 15px;"><strong>Motivo:</strong> {{ disputa.motivo }}</p>
+          
+          <div class="list section" style="background: #0d1117; border-radius: 8px; padding: 12px; border: 1px solid rgba(255,255,255,0.05);">
+            <div class="list-row" style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px;">
+              <strong style="color: #9aa6b8;">Local:</strong>
+              <span style="color: #fff;">{{ disputa.partida.equipo_local.nombre }}</span>
+            </div>
+            <div class="list-row" style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px;">
+              <strong style="color: #9aa6b8;">Visita:</strong>
+              <span style="color: #fff;">{{ disputa.partida.equipo_visita.nombre }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Formulario de Resolución del Árbitro -->
+        <form method="POST" action="{% url 'resolver_disputa' disputa.id_disputa %}" class="form-grid" style="display: flex; flex-direction: column; gap: 15px;">
+          {% csrf_token %}
+          <div class="field full">
+            <label style="display: block; margin-bottom: 5px; font-size: 13px; font-weight: 500; color: #fff;">Ganador oficial</label>
+            <select name="ganador_id" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff;">
+              <option value="{{ disputa.partida.equipo_local.id_equipo }}">{{ disputa.partida.equipo_local.nombre }}</option>
+              <option value="{{ disputa.partida.equipo_visita.id_equipo }}">{{ disputa.partida.equipo_visita.nombre }}</option>
+            </select>
+          </div>
+
+          <div class="field full">
+            <label style="display: block; margin-bottom: 5px; font-size: 13px; font-weight: 500; color: #fff;">Dictamen técnico vinculante</label>
+            <textarea name="dictamen_arbitro" required placeholder="Justificación del fallo arbitral..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff; min-height: 80px; resize: vertical;"></textarea>
+          </div>
+
+          <div class="field full">
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; text-align: center; justify-content: center;">Emitir fallo y cerrar disputa</button>
+          </div>
+        </form>
+
+      </div>
+      {% empty %}
+      <div class="card" style="background: rgba(22, 27, 34, 0.9); padding: 40px; text-align: center; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+        <p style="color: #9aa6b8; font-size: 15px;">No hay disputas activas pendientes de arbitraje en este momento.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</main>
+{% endblock %}

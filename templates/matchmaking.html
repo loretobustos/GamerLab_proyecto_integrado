@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block content %}
+<main style="padding: 40px 20px;">
+  <div class="container">
+    <div class="section-head" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;">
+      <div>
+        <h1 style="font-size: 38px; margin-bottom: 5px;">Matchmaking ELO</h1>
+        <p style="color: #9aa6b8; font-size: 15px;">Simulación de un equipo equilibrado entre estudiantes de la sede.</p>
+      </div>
+      <a class="btn" href="{% url 'lista_torneos' %}">Volver a Torneos</a>
+    </div>
+
+    <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+      
+      <!-- Formulario de Configuración ELO -->
+      <form method="POST" class="card form-grid" style="background: rgba(22, 27, 34, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 25px;">
+        {% csrf_token %}
+        <div class="field" style="margin-bottom: 15px;">
+          <label for="elo" style="display: block; margin-bottom: 6px; font-weight: 500; color: #fff;">ELO aproximado</label>
+          <select id="elo" name="elo" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff;">
+            <option value="1200">1200 · Plata / Oro bajo</option>
+            <option value="1500" selected>1500 · Oro alto / Platino</option>
+            <option value="1800">1800 · Diamante / Ascendente</option>
+            <option value="2100">2100 · Inmortal / Maestro</option>
+          </select>
+        </div>
+
+        <div class="field" style="margin-bottom: 20px;">
+          <label for="mode" style="display: block; margin-bottom: 6px; font-weight: 500; color: #fff;">Modo</label>
+          <select id="mode" name="mode" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff;">
+            <option>Intercarrera mixto</option>
+            <option>Misma carrera</option>
+          </select>
+        </div>
+
+        <div class="field full">
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; text-align: center; justify-content: center;">Calcular emparejamiento</button>
+        </div>
+      </form>
+
+      <!-- Panel de Resultados -->
+      <div class="card" style="background: rgba(22, 27, 34, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 25px; display: flex; flex-direction: column; justify-content: center;">
+        <h3 style="font-size: 20px; color: #fff; margin-bottom: 10px;">Resultado del Matchmaking</h3>
+        
+        {% if resultado_match %}
+          <div class="notice success" style="margin-top: 14px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 15px; border-radius: 8px;">
+            <p style="color: #cbd5e1; margin-bottom: 6px;"><strong>Rango analizado:</strong> {{ resultado_match.rango }}</p>
+            <p style="color: #cbd5e1; margin-bottom: 6px;"><strong>Modalidad:</strong> {{ resultado_match.modo }}</p>
+            <p style="margin-top: 10px; color: #34d399; font-weight: bold;">{{ resultado_match.estado }}</p>
+          </div>
+        {% else %}
+          <p style="margin-top: 14px; color: var(--muted, #9aa6b8); font-size: 14px; line-height: 1.5;">Selecciona tus parámetros y haz clic en calcular para buscar escuadras afines en la sede.</p>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</main>
+{% endblock %}

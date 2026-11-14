@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+<main style="padding: 40px 20px;">
+  <div class="container">
+    <div class="section-head" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;">
+      <div>
+        <h1 style="font-size: 38px; margin-bottom: 5px;">Torneos de la Sede</h1>
+        <p style="color: #9aa6b8; font-size: 15px;">Inscripciones, modalidades en potencia de 2 y premios en créditos comunitarios.</p>
+      </div>
+      <a class="btn btn-primary" href="{% url 'matchmaking' %}">Ir a Matchmaking ELO</a>
+    </div>
+
+    <div id="tournament-grid" class="grid-4" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px;">
+      {% for torneo in torneos %}
+      <div class="card item-card" style="background: rgba(22, 27, 34, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div class="item-top" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+            <div>
+              <h3 style="font-size: 18px; margin-bottom: 4px; color: #fff;">{{ torneo.nombre }}</h3>
+              <small style="color: var(--muted, #9aa6b8); font-size: 13px;">{{ torneo.juego }}</small>
+            </div>
+            <span class="badge badge-success" style="background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 4px 8px; border-radius: 4px; font-size: 12px;">{{ torneo.estado|default:"Activo" }}</span>
+          </div>
+          <p style="font-size: 14px; color: #cbd5e1; margin-bottom: 6px;">Cupos máx: <strong>{{ torneo.cupos_maximos }}</strong></p>
+          <p class="item-price" style="font-size: 16px; font-weight: bold; color: #fbbf24; margin-bottom: 15px;">+{{ torneo.premio_creditos|floatformat:0 }} CR</p>
+        </div>
+
+        <div>
+          {% if user.is_authenticated %}
+          <form method="POST" action="{% url 'inscribir_escuadra' torneo.pk %}" class="stack" style="display: flex; flex-direction: column; gap: 10px;">
+            {% csrf_token %}
+            <div class="field">
+              <input name="nombre_escuadra" placeholder="Nombre de tu Escuadra" required style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff; font-size: 14px;">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 10px; text-align: center; justify-content: center;">Inscribirse al Torneo</button>
+          </form>
+          {% else %}
+          <p style="text-align: center; font-size: 13px; margin-top: 10px;"><a href="{% url 'login' %}" style="color: var(--primary-2, #818cf8); text-decoration: none;">Inicia sesión para inscribirte</a></p>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <div class="card" style="grid-column: 1 / -1; padding: 30px; text-align: center;">
+        <p style="color: #9aa6b8;">No hay torneos activos programados por la administración en este momento.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</main>
+{% endblock %}

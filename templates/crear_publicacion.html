@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<main style="padding: 40px 20px; max-width: 600px; margin: 0 auto; color: #fff;">
+    <div style="background: rgba(22, 27, 34, 0.9); padding: 30px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+        <h2 style="color: #818cf8; margin-bottom: 10px;">📦 Publicar Artículo en el Bazar</h2>
+        <p style="color: #94a3b8; font-size: 14px; margin-bottom: 20px;">Ofrece tus periféricos, accesorios o juegos a la comunidad de INACAP Sede Maipú bajo custodia Escrow.</p>
+
+        {% if error %}
+            <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 14px;">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Título del Producto (ej: Teclado Mecánico Redragon)</label>
+                <input type="text" name="titulo" maxlength="80" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff;">
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Descripción y Estado Físico</label>
+                <textarea name="descripcion" rows="4" maxlength="350" required placeholder="Detalles de uso, estado (ej: 9/10), modelo, switches, etc." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff; resize: vertical;"></textarea>
+                <small style="color: #6b7280; font-size: 12px;">Máximo 350 caracteres.</small>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Valor en Créditos (CR)</label>
+                <input type="number" step="1" min="10" max="5000" name="precio_creditos" required placeholder="Ej: 350" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff;">
+                <small style="color: #6b7280; font-size: 12px;">Rango permitido: entre 10 y 5.000 CR.</small>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Fotografía del Producto (Opcional)</label>
+                <input type="file" name="imagen" accept="image/jpeg,image/png,image/webp" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff;">
+                <small style="color: #6b7280; font-size: 12px;">Formatos permitidos: JPG, PNG o WebP.</small>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" style="flex: 1; padding: 12px; background: #6366f1; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Publicar Artículo</button>
+                <a href="{% url 'bazar_catalogo' %}" style="padding: 12px 20px; background: rgba(255,255,255,0.1); color: #fff; text-align: center; border-radius: 6px; text-decoration: none; font-weight: bold; border: 1px solid rgba(255,255,255,0.2);">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</main>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<main style="display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 160px); padding: 40px 20px;">
+  <div class="container" style="max-width: 480px; width: 100%;">
+    <div class="card" style="padding: 30px;">
+      <h2 style="margin-bottom: 8px; font-size: 28px;">Iniciar Sesión</h2>
+      <p style="color: #9aa6b8; margin-bottom: 20px; font-size: 14px;">Acceso institucional GamerLab · INACAP Sede Maipú.</p>
+      
+      {% if error %}
+        <div class="notice warning" style="margin-bottom: 16px; padding: 10px 14px; border-radius: 6px;">{{ error }}</div>
+      {% endif %}
+      
+      <form method="POST" action="{% url 'login' %}" class="form-grid">
+        {% csrf_token %}
+        <div class="field full">
+          <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 500;">Usuario o Correo Institucional</label>
+          <input type="text" name="username" required autofocus style="width: 100%;">
+        </div>
+        
+        <div class="field full">
+          <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 500;">Contraseña</label>
+          <input type="password" name="password" required style="width: 100%;">
+        </div>
+        
+        <div class="field full" style="margin-top: 10px;">
+          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 10px;">Entrar a la plataforma</button>
+        </div>
+      </form>
+      
+      <p style="margin-top: 20px; text-align: center; font-size: 14px;">
+        <a href="{% url 'registro' %}" style="color: var(--primary-2, #818cf8); text-decoration: none;">¿No tienes cuenta? Regístrate aquí</a>
+      </p>
+      <p style="margin-top: 15px; text-align: center; font-size: 13px;">
+  <a href="{% url 'password_reset' %}" style="color: #9aa6b8; text-decoration: none;">¿Olvidaste tu contraseña?</a>
+</p>
+    </div>
+  </div>
+</main>
+{% endblock %}
