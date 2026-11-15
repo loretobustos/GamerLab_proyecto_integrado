@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<main style="padding: 40px 20px; max-width: 600px; margin: 0 auto;">
+  <div class="card" style="background: rgba(22, 27, 34, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 30px;">
+    
+    <h1 style="font-size: 28px; margin-bottom: 10px; color: #fff;">Registrar Resultado</h1>
+    <p style="color: #9aa6b8; font-size: 14px; margin-bottom: 25px;">
+      Partida: <strong>{{ partida.escuadra_1.nombre_escuadra }} vs {{ partida.escuadra_2.nombre_escuadra }}</strong>
+    </p>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div style="padding: 12px; margin-bottom: 20px; border-radius: 6px; background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); font-size: 13px;">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 20px;">
+      {% csrf_token %}
+      
+      <div style="display: flex; gap: 15px;">
+        <div style="flex: 1;">
+          <label style="display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 6px;">Marcador {{ partida.escuadra_1.nombre_escuadra }}</label>
+          <input type="number" name="marcador_1" min="0" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff;">
+        </div>
+        <div style="flex: 1;">
+          <label style="display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 6px;">Marcador {{ partida.escuadra_2.nombre_escuadra }}</label>
+          <input type="number" name="marcador_2" min="0" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff;">
+        </div>
+      </div>
+
+      <div>
+        <label style="display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 6px;">Adjuntar Evidencia (Captura JPG/PNG, máx 5 MB)</label>
+        <input type="file" name="evidencia" accept=".jpg, .jpeg, .png" required style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff; font-size: 13px;">
+        <small style="color: #64748b; font-size: 11px; display: block; margin-top: 4px;">Asegúrate de que la imagen sea legible y menor a 5 megabytes (RNF-10).</small>
+      </div>
+
+      <button type="submit" class="btn btn-success" style="width: 100%; padding: 12px; background: #10b981; border: none; color: #fff; border-radius: 6px; font-weight: bold; cursor: pointer; text-align: center; margin-top: 10px;">Enviar Resultado y Evidencia</button>
+    </form>
+
+  </div>
+</main>
+{% endblock %}

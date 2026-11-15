@@ -2,6 +2,16 @@
 {% block content %}
 <main style="padding: 40px 20px;">
   <div class="container">
+    
+    <!-- Mensajes de confirmación o error (RF-13 / CP-HU03-06) -->
+    {% if messages %}
+      {% for message in messages %}
+        <div style="padding: 14px 18px; margin-bottom: 20px; border-radius: 8px; background: rgba(22, 27, 34, 0.95); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-left: 4px solid {% if message.tags == 'error' %}#ef4444{% elif message.tags == 'warning' %}#f59e0b{% else %}#10b981{% endif %}; font-size: 14px;">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
     <div class="section-head" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;">
       <div>
         <h1 style="font-size: 38px; margin-bottom: 5px;">Torneos de la Sede</h1>
@@ -10,54 +20,88 @@
       
       <!-- Contenedor de botones de acción superior -->
       <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-        {% if user.is_authenticated and user.rol == 'Administrador' or user.rol == 'DAE' or user.is_superuser %}
-        <a class="btn btn-primary" href="{% url 'crear_torneo' %}" style="background: #10b981; border-color: #10b981; color: #fff; text-decoration: none; padding: 10px 16px; border-radius: 6px; font-weight: 500; display: inline-flex; align-items: center;">+ Crear Torneo</a>
+        {% if user.is_authenticated %}
+          {% if user.rol == 'Administrador' or user.rol == 'DAE' or user.is_superuser %}
+          <a class="btn btn-primary" href="{% url 'crear_torneo' %}" style="background: #10b981; border-color: #10b981; color: #fff; text-decoration: none; padding: 10px 16px; border-radius: 6px; font-weight: 500; display: inline-flex; align-items: center;">+ Crear Torneo</a>
+          {% endif %}
         {% endif %}
         
-        <a class="btn btn-primary" href="{% url 'matchmaking' %}">Ir a Matchmaking ELO</a>
+        <a class="btn btn-secondary" href="{% url 'matchmaking' %}">Ir a Matchmaking ELO</a>
 
         <!-- Botón de Intercarreras visible solo para roles con permiso -->
-        {% if user.is_authenticated and user.rol == 'Docente' or user.rol == 'Gestor' or user.rol == 'DAE' or user.rol == 'Administrador' or user.is_superuser %}
-        <a href="{% url 'ranking_intercarreras' %}" class="btn btn-warning btn-sm fw-bold text-dark">🏆 Intercarreras</a>
+        {% if user.is_authenticated %}
+          {% if user.rol == 'Docente' or user.rol == 'Gestor' or user.rol == 'DAE' or user.rol == 'Administrador' or user.is_superuser %}
+          <a href="{% url 'ranking_intercarreras' %}" class="btn btn-warning btn-sm fw-bold text-dark">🏆 Intercarreras</a>
+          {% endif %}
         {% endif %}
       </div>
     </div>
 
-    <div id="tournament-grid" class="grid-4" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px;">
+    <div id="tournament-grid" class="grid-4" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
       {% for torneo in torneos %}
       <div class="card item-card" style="background: rgba(22, 27, 34, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+        
+        <!-- Información del Torneo -->
         <div>
           <div class="item-top" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
             <div>
               <h3 style="font-size: 18px; margin-bottom: 4px; color: #fff;">{{ torneo.nombre }}</h3>
               <small style="color: var(--muted, #9aa6b8); font-size: 13px;">{{ torneo.juego }}</small>
             </div>
-            <span class="badge badge-success" style="background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 4px 8px; border-radius: 4px; font-size: 12px;">{{ torneo.estado|default:"Activo" }}</span>
+            {% if torneo.validado_dae %}
+              <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Validado DAE</span>
+            {% else %}
+              <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Pendiente DAE</span>
+            {% endif %}
           </div>
-          <p style="font-size: 14px; color: #cbd5e1; margin-bottom: 6px;">Cupos máx: <strong>{{ torneo.cupos_maximos }}</strong></p>
+          <p style="font-size: 14px; color: #cbd5e1; margin-bottom: 4px;">Cupos máx: <strong>{{ torneo.cupos_maximos }}</strong></p>
+          <p style="font-size: 14px; color: #cbd5e1; margin-bottom: 10px;">Inscritos: <strong style="color: #34d399;">{{ torneo.escuadras_inscritas.count }} / {{ torneo.cupos_maximos }}</strong></p>
           <p class="item-price" style="font-size: 16px; font-weight: bold; color: #fbbf24; margin-bottom: 15px;">+{{ torneo.premio_creditos|floatformat:0 }} CR</p>
         </div>
 
-        <div>
-          {% if user.is_authenticated %}
-          <form method="POST" action="{% url 'inscribir_escuadra' torneo.pk %}" class="stack" style="display: flex; flex-direction: column; gap: 10px;">
-            {% csrf_token %}
-            <div class="field">
-              <input name="nombre_escuadra" placeholder="Nombre de Escuadra (Opcional)" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff; font-size: 14px;">
+        <!-- Botón de validación solo para DAE si aún no está validado -->
+        {% if user.is_authenticated and not torneo.validado_dae %}
+          {% if user.rol == 'DAE' or user.is_superuser %}
+            <div style="margin-bottom: 10px;">
+              <a href="{% url 'validar_torneo_dae' torneo.pk %}" class="btn btn-warning" style="width: 100%; display: block; text-align: center; padding: 8px; border-radius: 6px; font-weight: bold; text-decoration: none; color: #000;">
+                ✔ Validar Espacio (DAE)
+              </a>
             </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 10px; text-align: center; justify-content: center;">Inscribirse al Torneo</button>
-          </form>
+          {% endif %}
+        {% endif %}
+
+        <!-- Sección de Inscripción (Controlada por Cupos y Autenticación) -->
+        <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+          {% if user.is_authenticated %}
+            {% if torneo.escuadras_inscritas.count < torneo.cupos_maximos %}
+            <form action="{% url 'inscribir_torneo' torneo.pk %}" method="POST" style="display: flex; flex-direction: column; gap: 10px;">
+            {% csrf_token %}
+                <div class="field">
+                  <input name="nombre_escuadra" placeholder="Nombre de Escuadra (Opcional)" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff; font-size: 14px;">
+                </div>
+                <button type="submit" class="btn btn-success" style="width: 100%; padding: 10px; background: #10b981; border: none; color: #fff; border-radius: 6px; font-weight: bold; cursor: pointer; text-align: center;">Inscribir mi Escuadra</button>
+              </form>
+            {% else %}
+              <div class="alert alert-danger text-center py-2 mb-0" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border-radius: 6px; font-size: 13px;">
+                Torneo Completado (Sin Cupos)
+              </div>
+            {% endif %}
           {% else %}
-          <p style="text-align: center; font-size: 13px; margin-top: 10px;"><a href="{% url 'login' %}" style="color: var(--primary-2, #818cf8); text-decoration: none;">Inicia sesión para inscribirte</a></p>
+            <p style="text-align: center; font-size: 13px; margin: 0;"><a href="{% url 'login' %}" style="color: var(--primary-2, #818cf8); text-decoration: none;">Inicia sesión para inscribirte</a></p>
           {% endif %}
         </div>
+
       </div>
       {% empty %}
-      <div class="card" style="grid-column: 1 / -1; padding: 30px; text-align: center;">
-        <p style="color: #9aa6b8;">No hay torneos activos programados por la administración en este momento.</p>
+      <div class="card" style="grid-column: 1 / -1; padding: 30px; text-align: center; background: rgba(22, 27, 34, 0.9); border-radius: 10px;">
+        <p style="color: #9aa6b8; margin: 0;">No hay torneos activos programados por la administración en este momento.</p>
       </div>
       {% endfor %}
     </div>
+ 
+<a href="{% url 'registrar_resultado' 1 %}" class="btn" style="width: 100%; display: block; text-align: center; padding: 10px; background: #f59e0b; border-radius: 6px; font-weight: bold; text-decoration: none; color: #000; font-size: 13px;">
+  📷 Registrar Resultado y Evidencia
+</a>
   </div>
 </main>
 {% endblock %}

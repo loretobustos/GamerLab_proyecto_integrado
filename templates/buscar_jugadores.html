@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Búsqueda Avanzada de Jugadores</h2>
+    <p class="text-muted">Filtra perfiles por videojuego y rango (RF-11 / RNF-07)</p>
+
+    <!-- Formulario de Filtros -->
+    <form method="GET" action="{% url 'buscar_jugadores' %}" class="row g-3 mb-4">
+        <div class="col-md-4">
+            <label for="juego" class="form-label">Videojuego</label>
+            <input type="text" class="form-control" id="juego" name="juego" value="{{ juego_seleccionado }}" placeholder="Ej. Valorant, LoL...">
+        </div>
+        <div class="col-md-4">
+            <label for="rango" class="form-label">Rango</label>
+            <input type="text" class="form-control" id="rango" name="rango" value="{{ rango_seleccionado }}" placeholder="Ej. Oro, Diamante...">
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">Buscar Jugador</button>
+        </div>
+    </form>
+
+    <!-- Resultados de la Búsqueda -->
+    <hr>
+    <div class="row">
+        {% if jugadores %}
+            {% for j in jugadores %}
+                <div class="col-md-4 mb-3">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">@{{ j.username }}</h5>
+                            <p class="card-text mb-1"><strong>Juego Favorito:</strong> {{ j.juego_favorito|default:"No especificado" }}</p>
+                            <p class="card-text mb-1"><strong>Rango:</strong> {{ j.rango|default:"Sin rango" }}</p>
+                            <span class="badge bg-success">Activo</span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-warning" role="alert">
+                    No se encontraron jugadores que coincidan con los filtros de búsqueda.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

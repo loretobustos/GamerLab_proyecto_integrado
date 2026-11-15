@@ -9,23 +9,25 @@
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-  <!-- Barra de navegación con las clases exactas de styles.css -->
+  <!-- Barra de navegación limpia y ordenada -->
   <header class="site-header">
     <div class="container navbar">
       <a class="brand" href="{% url 'home' %}">
-        {% comment %} <img src="{% static 'img/logo.svg' %}" alt="Logo"> {% endcomment %}
         <div>
           <span class="brand-title">GAMERLAB</span>
           <span class="brand-sub">CampusArena · Maipú</span>
         </div>
       </a>
 
-      <nav>
+      <nav style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
         <a href="{% url 'home' %}">Inicio</a>
         <a href="{% url 'lista_torneos' %}">Torneos</a>
         <a href="{% url 'bazar_catalogo' %}">Bazar</a>
         <a href="{% url 'mis_canjes' %}" style="color: #34d399;">🛒 Mis Canjes</a>
-        
+        <a href="{% url 'buscar_jugadores' %}">Buscador</a>
+        <a href="{% url 'mis_invitaciones' %}">Invitaciones</a>
+        <a href="{% url 'gestionar_escuadra' %}">Mi Escuadra</a>
+
         {% if user.is_authenticated %}
             <!-- Vistas exclusivas para Administradores o Staff (Panel Escrow) -->
             {% if user.is_staff or user.rol == 'Administrador' %}

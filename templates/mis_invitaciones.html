@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Mis Invitaciones a Escuadras</h2>
+    <p class="text-muted">Revisa y gestiona las invitaciones enviadas por los capitanes de equipo (CP-HU03-05).</p>
+    <hr>
+
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Invitaciones Pendientes</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for inv in invitaciones %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                <div>
+                                    <h5 class="mb-1 text-primary">Escuadra: {{ inv.escuadra.nombre_escuadra }}</h5>
+                                    <p class="mb-0 text-muted">Invitado por el capitán: @{{ inv.escuadra.capitan.username }}</p>
+                                </div>
+                                <div>
+                                    {% if inv.estado == 'Pendiente' %}
+                                        <form action="{% url 'aceptar_invitacion' inv.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-success btn-sm">Aceptar Invitación</button>
+                                        </form>
+                                    {% else %}
+                                        <span class="badge bg-success">Aceptada</span>
+                                    {% endif %}
+                                </div>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item text-center text-muted py-4">
+                                No tienes invitaciones pendientes en este momento.
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

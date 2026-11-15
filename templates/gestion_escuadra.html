@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Gestión de Escuadra y Equipos</h2>
+            <p class="text-muted">Crea tu equipo, personaliza tu logo e invita a tus compañeros para competir en los torneos (RF-12 / CP-HU03-04).</p>
+            <hr>
+        </div>
+    </div>
+
+    {% if not escuadra %}
+        <!-- SECCIÓN 1: Formulario para Crear Escuadra (Si el usuario no tiene equipo) -->
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Registrar Nueva Escuadra</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="nombre_escuadra" class="form-label">Nombre del Equipo</label>
+                                <input type="text" class="form-control" id="nombre_escuadra" name="nombre_escuadra" placeholder="Ej. Team Alpha, ByteBrawlers" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="logo" class="form-label">Logotipo de la Escuadra</label>
+                                <input type="file" class="form-control" id="logo" name="logo" accept="image/*">
+                                <div class="form-text">Sube una imagen representativa para tu equipo.</div>
+                            </div>
+                            <button type="submit" name="crear_equipo" class="btn btn-success w-100">Crear Escuadra</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <!-- SECCIÓN 2: Panel de Administración del Equipo (Si el usuario ya creó su escuadra) -->
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm text-center">
+                    <div class="card-body">
+                        {% if escuadra.logo %}
+                            <img src="{{ escuadra.logo.url }}" alt="Logo de escuadra" class="rounded-circle mb-3 shadow" width="100" height="100" style="object-fit: cover;">
+                        {% else %}
+                            <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow" style="width: 100px; height: 100px; font-size: 2rem;">
+                                {{ escuadra.nombre_escuadra|slice:":2"|upper }}
+                            </div>
+                        {% endif %}
+                        <h4 class="card-title text-primary">{{ escuadra.nombre_escuadra }}</h4>
+                        <p class="text-muted mb-1"><strong>Capitán:</strong> @{{ escuadra.capitan.username }}</p>
+                        <span class="badge bg-success">Escuadra Activa</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">Invitar Jugadores a la Escuadra</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" class="row g-3">
+                            {% csrf_token %}
+                            <div class="col-md-8">
+                                <label for="username_invitado" class="form-label">Gamertag o Usuario de INACAP</label>
+                                <input type="text" class="form-control" id="username_invitado" name="username_invitado" placeholder="Ingresa el username exacto del compañero" required>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="submit" name="invitar_jugador" class="btn btn-primary w-100">Enviar Invitación</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">Integrantes e Invitaciones Pendientes</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>@{{ escuadra.capitan.username }} (Capitán)</span>
+                                <span class="badge bg-primary">Líder</span>
+                            </li>
+                            <!-- Aquí puedes listar los integrantes aceptados o invitaciones -->
+                            {% for invitacion in invitaciones %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>@{{ invitacion.jugador_invitado.username }}</span>
+                                    <span class="badge bg-warning text-dark">{{ invitacion.estado }}</span>
+                                </li>
+                            {% empty %}
+                                <li class="list-group-item text-muted text-center py-3">
+                                    No hay invitaciones enviadas recientemente.
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
