@@ -19,6 +19,11 @@ class Usuario(AbstractUser):
     carrera = models.ForeignKey(Carrera, on_delete=models.SET_NULL, null=True, blank=True)
     saldo_creditos = models.DecimalField(max_digits=10, decimal_places=2, default=50.00)
 
+    # --- NUEVOS CAMPOS PARA PERFIL GAMER (RF-10) ---
+    gamertag = models.CharField(max_length=50, blank=True, null=True)
+    juego_favorito = models.CharField(max_length=100, blank=True, null=True)
+    rango = models.CharField(max_length=50, blank=True, null=True)
+
     # Evitar conflictos con los related_name por defecto de Django
     groups = models.ManyToManyField(
         'auth.Group',

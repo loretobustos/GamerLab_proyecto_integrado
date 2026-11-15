@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block content %}
+<main style="padding: 40px 20px; display: flex; justify-content: center; align-items: center; min-height: 80vh;">
+  <div class="container" style="max-width: 600px; width: 100%;">
+    
+    <div class="card" style="background: rgba(22, 27, 34, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 35px; box-shadow: 0 8px 24px rgba(0,0,0,0.5);">
+      
+      <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="font-size: 28px; color: #fff; margin-bottom: 8px;">🎮 Crear Nuevo Torneo Oficial</h1>
+        <p style="color: #9aa6b8; font-size: 14px;">Configura los parámetros, cupos en potencia de 2 y premios para la comunidad de INACAP Sede Maipú.</p>
+      </div>
+
+      <form method="POST" style="display: flex; flex-direction: column; gap: 20px;">
+        {% csrf_token %}
+        
+        <!-- Nombre del Torneo -->
+        <div class="field" style="display: flex; flex-direction: column; gap: 6px;">
+          <label style="color: #cbd5e1; font-size: 14px; font-weight: 500;">Nombre del Torneo</label>
+          <input type="text" name="nombre" value="{{ datos_previos.nombre }}" placeholder="Ej: Copa INACAP Apertura" required 
+                 style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff; font-size: 14px;">
+        </div>
+
+        <!-- Videojuego -->
+        <div class="field" style="display: flex; flex-direction: column; gap: 6px;">
+          <label style="color: #cbd5e1; font-size: 14px; font-weight: 500;">Videojuego</label>
+          <input type="text" name="juego" value="{{ datos_previos.juego }}" placeholder="Ej: Valorant, League of Legends, FC25" required 
+                 style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff; font-size: 14px;">
+        </div>
+
+        <!-- Fila doble: Cupos (con validación de error en rojo) y Premios -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          
+          <!-- Cupos Máximos -->
+          <div class="field" style="display: flex; flex-direction: column; gap: 6px;">
+            <label style="color: #cbd5e1; font-size: 14px; font-weight: 500;">Cupos Máx. (Potencia de 2)</label>
+            <input type="number" name="cupos_maximos" value="{{ datos_previos.cupos_maximos|default:16 }}" min="4" max="64" required 
+                   style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid {% if error_cupos %}#ef4444{% else %}rgba(255,255,255,0.2){% endif %}; background: #0d1117; color: #fff; font-size: 14px;">
+            {% if error_cupos %}
+            <small style="color: #ef4444; font-size: 11px; margin-top: 2px;">Debe ser potencia de 2 (4, 8, 16, 32).</small>
+            {% endif %}
+          </div>
+
+          <!-- Premio en Créditos -->
+          <div class="field" style="display: flex; flex-direction: column; gap: 6px;">
+            <label style="color: #cbd5e1; font-size: 14px; font-weight: 500;">Premio (CR)</label>
+            <input type="number" name="premio_creditos" value="{{ datos_previos.premio_creditos|default:500 }}" min="0" required 
+                   style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff; font-size: 14px;">
+          </div>
+
+        </div>
+
+        <!-- Botones de Acción -->
+        <div style="display: flex; gap: 15px; margin-top: 10px;">
+          <button type="submit" class="btn btn-primary" style="flex: 2; padding: 12px; text-align: center; justify-content: center; font-weight: bold; background: #6366f1; color: #fff; border: none; border-radius: 8px; cursor: pointer;">
+            Publicar Torneo
+          </button>
+          <a href="/torneos/" class="btn" style="flex: 1; padding: 12px; text-align: center; justify-content: center; background: rgba(255,255,255,0.1); color: #fff; text-decoration: none; border-radius: 8px; display: flex; align-items: center;">
+            Cancelar
+          </a>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</main>
+{% endblock %}

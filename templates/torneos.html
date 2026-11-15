@@ -7,7 +7,20 @@
         <h1 style="font-size: 38px; margin-bottom: 5px;">Torneos de la Sede</h1>
         <p style="color: #9aa6b8; font-size: 15px;">Inscripciones, modalidades en potencia de 2 y premios en créditos comunitarios.</p>
       </div>
-      <a class="btn btn-primary" href="{% url 'matchmaking' %}">Ir a Matchmaking ELO</a>
+      
+      <!-- Contenedor de botones de acción superior -->
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        {% if user.is_authenticated and user.rol == 'Administrador' or user.rol == 'DAE' or user.is_superuser %}
+        <a class="btn btn-primary" href="{% url 'crear_torneo' %}" style="background: #10b981; border-color: #10b981; color: #fff; text-decoration: none; padding: 10px 16px; border-radius: 6px; font-weight: 500; display: inline-flex; align-items: center;">+ Crear Torneo</a>
+        {% endif %}
+        
+        <a class="btn btn-primary" href="{% url 'matchmaking' %}">Ir a Matchmaking ELO</a>
+
+        <!-- Botón de Intercarreras visible solo para roles con permiso -->
+        {% if user.is_authenticated and user.rol == 'Docente' or user.rol == 'Gestor' or user.rol == 'DAE' or user.rol == 'Administrador' or user.is_superuser %}
+        <a href="{% url 'ranking_intercarreras' %}" class="btn btn-warning btn-sm fw-bold text-dark">🏆 Intercarreras</a>
+        {% endif %}
+      </div>
     </div>
 
     <div id="tournament-grid" class="grid-4" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px;">
@@ -30,7 +43,7 @@
           <form method="POST" action="{% url 'inscribir_escuadra' torneo.pk %}" class="stack" style="display: flex; flex-direction: column; gap: 10px;">
             {% csrf_token %}
             <div class="field">
-              <input name="nombre_escuadra" placeholder="Nombre de tu Escuadra" required style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff; font-size: 14px;">
+              <input name="nombre_escuadra" placeholder="Nombre de Escuadra (Opcional)" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #0d1117; color: #fff; font-size: 14px;">
             </div>
             <button type="submit" class="btn btn-primary" style="width: 100%; padding: 10px; text-align: center; justify-content: center;">Inscribirse al Torneo</button>
           </form>

@@ -18,5 +18,6 @@ urlpatterns = [
     path('password_reset/', GamerLabPasswordResetView.as_view(), name='password_reset'),
     path('password_reset/done/', GamerLabPasswordResetDoneView.as_view(), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', GamerLabPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('buscar-jugadores/', views.buscar_jugadores_view, name='buscar_jugadores'),
     path('reset/done/', GamerLabPasswordResetCompleteView.as_view(), name='password_reset_complete'),
 ]

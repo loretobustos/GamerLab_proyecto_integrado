@@ -1,6 +1,8 @@
+import re
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
 from .models import Usuario, Carrera
 from django.contrib.auth.views import (
     PasswordResetView,
@@ -9,7 +11,7 @@ from django.contrib.auth.views import (
     PasswordResetCompleteView
 )
 from django.urls import reverse_lazy
-
+from django.contrib import messages
 
 class GamerLabPasswordResetView(PasswordResetView):
     template_name = 'password_reset.html'
@@ -111,6 +113,7 @@ def registro_view(request):
     carreras = Carrera.objects.all()
     return render(request, 'registro.html', {'carreras': carreras, 'error': error})
 
+
 def login_view(request):
     error = None
     if request.method == 'POST':
@@ -157,11 +160,67 @@ def perfil_billetera_view(request):
     }
     return render(request, 'perfil.html', contexto)
 
+
 @login_required
 def panel_dae_view(request):
+    # Validación estricta para asegurar que solo roles institucionales DAE o Admin accedan
+    if request.user.rol not in ['DAE', 'Administrador'] and not request.user.is_superuser:
+        return HttpResponseForbidden("Acceso denegado: No tienes permisos institucionales DAE.")
     return render(request, 'panel_dae.html')
 
 
 @login_required
 def editar_perfil_view(request):
+    """
+    Permite registrar y actualizar los datos del perfil gamer (Gamertag, Juego, Rango)
+    con validaciones de seguridad contra duplicados y caracteres no permitidos (CP-HU03-02).
+    """
+    if request.method == 'POST':
+        gamertag = request.POST.get('gamertag', '').strip()
+        juego_favorito = request.POST.get('juego_favorito', '').strip()
+        rango = request.POST.get('rango', '').strip()
+
+        # 1. Validación de contenido no permitido / caracteres maliciosos (Ej: etiquetas HTML o inyecciones)
+        if gamertag and not re.match(r"^[\w\s\-#]+$", gamertag):
+            messages.error(request, "Error: El gamertag contiene caracteres no permitidos o contenido potencialmente malicioso.")
+            return redirect('perfil')
+
+        # 2. Validación de Gamertag Duplicado (excluyendo al propio usuario actual)
+        if gamertag and Usuario.objects.filter(gamertag__iexact=gamertag).exclude(id=request.user.id).exists():
+            messages.error(request, "Error: El gamertag ingresado ya se encuentra registrado por otro jugador.")
+            return redirect('perfil')
+
+        # Guardado seguro
+        request.user.gamertag = gamertag
+        request.user.juego_favorito = juego_favorito
+        request.user.rango = rango
+        request.user.save()
+        
+        messages.success(request, "¡Perfil gamer actualizado correctamente!")
+        return redirect('perfil')
+
     return render(request, 'perfil.html')
+
+@login_required
+def buscar_jugadores_view(request):
+    """
+    Permite filtrar a los jugadores registrados por videojuego favorito y rango (CP-HU03-03).
+    """
+    juego = request.GET.get('juego', '').strip()
+    rango = request.GET.get('rango', '').strip()
+
+    # Partimos filtrando solo a los usuarios que tengan rol de Jugador
+    jugadores = Usuario.objects.filter(rol='Jugador')
+
+    if juego:
+        jugadores = jugadores.filter(juego_favorito__icontains=juego)
+    
+    if rango:
+        jugadores = jugadores.filter(rango__iexact=rango)
+
+    contexto = {
+        'jugadores': jugadores,
+        'juego_seleccionado': juego,
+        'rango_seleccionado': rango,
+    }
+    return render(request, 'buscar_jugadores.html', contexto)

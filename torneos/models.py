@@ -1,28 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db import models
 
-class Torneo(models.Model):
-    nombre = models.CharField(max_length=100)
-    juego = models.CharField(max_length=50)
-    cupos_maximos = models.IntegerField(default=16) # Ej: 8, 16, 32
-    premio_creditos = models.IntegerField(default=500)
-    estado = models.CharField(max_length=20, default='Activo')
-
-    def clean(self):
-        super().clean()
-        # Validar que los cupos sean potencia de 2
-        n = self.cupos_maximos
-        if not (n > 0 and (n & (n - 1)) == 0):
-            raise ValidationError({'cupos_maximos': 'Los cupos máximos del torneo deben ser obligatoriamente una potencia de 2 (8, 16, 32, 64).'})
-
-    def save(self, *args, **kwargs):
-        self.full_clean() # Fuerza la ejecución de clean() antes de guardar
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"{self.nombre} ({self.juego})"
 class Torneo(models.Model):
     id_torneo = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=150)
@@ -35,10 +14,28 @@ class Torneo(models.Model):
     ])
     cupos_maximos = models.IntegerField(default=16)
     premio_creditos = models.DecimalField(max_digits=10, decimal_places=2, default=1000.00)
+    estado = models.CharField(max_length=20, default='Activo')
+    validado_dae = models.BooleanField(default=False)
     fecha_inicio = models.DateTimeField(auto_now_add=True)
 
+    # Campos para soporte de laboratorios y reservas presenciales (RF-16)
+    laboratorio = models.CharField(max_length=50, blank=True, null=True)        # Ej: "L-3"
+    fecha_reserva = models.DateField(blank=True, null=True)                    # Fecha de la final presencial
+    horario_reserva = models.CharField(max_length=50, blank=True, null=True)   # Bloque horario
+
     def __str__(self):
-        return f"{self.nombre} [{self.nivel_requerido}]"
+        return f"{self.nombre} [{self.nivel_requerido}] ({self.juego})"
+
+    def clean(self):
+        super().clean()
+        # Validar que los cupos sean estrictamente potencia de 2
+        n = self.cupos_maximos
+        if not (n > 0 and (n & (n - 1)) == 0):
+            raise ValidationError({'cupos_maximos': 'Los cupos máximos del torneo deben ser obligatoriamente una potencia de 2 (4, 8, 16, 32, 64).'})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()  # Fuerza la ejecución de clean() antes de guardar
+        super().save(*args, **kwargs)
 
     def promedio_estrellas(self):
         calificaciones = self.calificaciones.all()
@@ -53,12 +50,33 @@ class Escuadra(models.Model):
     """
     id_escuadra = models.AutoField(primary_key=True)
     nombre_escuadra = models.CharField(max_length=100, unique=True)
+    logo = models.ImageField(upload_to='logos_escuadras/', blank=True, null=True) # Soporte para imagen/logo
     torneo = models.ForeignKey(Torneo, on_delete=models.CASCADE, related_name='escuadras_inscritas', null=True, blank=True)
     capitan = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='escuadras_lideradas')
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.nombre_escuadra
+
+
+class InvitacionEscuadra(models.Model):
+    """
+    Gestiona las invitaciones de jugadores a una escuadra (CP-HU03-04).
+    """
+    escuadra = models.ForeignKey(Escuadra, on_delete=models.CASCADE, related_name='invitaciones')
+    jugador_invitado = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='invitaciones_recibidas')
+    estado = models.CharField(max_length=20, default='Pendiente', choices=[
+        ('Pendiente', 'Pendiente'),
+        ('Aceptada', 'Aceptada'),
+        ('Rechazada', 'Rechazada')
+    ])
+    fecha_invitacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('escuadra', 'jugador_invitado')
+
+    def __str__(self):
+        return f"Invitación de {self.escuadra.nombre_escuadra} a {self.jugador_invitado.username} [{self.estado}]"
 
 
 class Partida(models.Model):
@@ -100,3 +118,25 @@ class CalificacionTorneo(models.Model):
 
     def __str__(self):
         return f"{self.torneo.nombre} - {self.puntuacion} ⭐"
+
+
+class MensajeChat(models.Model):
+    partida = models.ForeignKey(Partida, on_delete=models.CASCADE, related_name='mensajes')
+    emisor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    texto = models.TextField()
+    fecha_envio = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Mensaje de {self.emisor.username}"
+
+
+class EvidenciaPartida(models.Model):
+    partida = models.ForeignKey(Partida, on_delete=models.CASCADE, related_name='evidencias')
+    capitan = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    marcador = models.CharField(max_length=20)
+    archivo = models.FileField(upload_to='evidencias_partidas/')
+    estado = models.CharField(max_length=20, default='Pendiente')
+    fecha_subida = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Evidencia de {self.capitan.username} - {self.marcador}"
