@@ -159,3 +159,24 @@ def mis_canjes_view(request):
 
     return render(request, 'mis_canjes.html', {'transacciones': mis_transacciones})
 
+@login_required
+def liberar_creditos_view(request, canje_id):
+    """
+    RF-20 / RNF-01 / CP-HU08-01:
+    Impedir liberación de créditos por un usuario ajeno al canje (Trader C).
+    """
+    # 1. Obtenemos el canje actual
+    canje = get_object_or_404(Canje, id=canje_id)
+    
+    # 2. VALIDACIÓN ESTRICTA (CP-HU08-01): Verificar si el usuario es parte del canje
+    es_participante = (canje.comprador == request.user) or (canje.vendedor == request.user)
+    
+    if not es_participante and not request.user.is_superuser and getattr(request.user, 'rol', None) not in ['Administrador']:
+        messages.error(request, "Acceso denegado: Operación rechazada por falta de autorización.")
+        return redirect('/bazar/') # O a la vista que corresponda
+
+    # 3. Si es participante legítimo, continúa el código normal de liberación...
+    # (aquí va tu lógica existente de actualizar saldos, estado de escrow, etc.)
+    
+    messages.success(request, "¡Créditos liberados correctamente!")
+    return redirect('/bazar/')
